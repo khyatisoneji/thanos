@@ -407,7 +407,7 @@ func createEmptyBlock(dir string, mint int64, maxt int64, extLset labels.Labels,
 		return ulid.ULID{}, errors.Wrap(err, "close index")
 	}
 
-	w, err := index.NewWriter(path.Join(dir, uid.String(), "index"))
+	w, err := index.NewWriter(context.Background(), path.Join(dir, uid.String(), "index"))
 	if err != nil {
 		return ulid.ULID{}, errors.Wrap(err, "new index")
 	}

@@ -27,6 +27,13 @@ We use *breaking* word for marking changes that are not backward compatible (rel
 - [#1881](https://github.com/thanos-io/thanos/pull/1881) Store Gateway: memcached support for index cache. See [documentation](docs/components/store.md/#index-cache) for further information.
 - [#1904](https://github.com/thanos-io/thanos/pull/1904) Add a skip-chunks option in Store Series API to improve the response time of `/api/v1/series` endpoint.
 
+### Changed
+
+- []() Upgraded Prometheus dependencies to v2.15.2. This includes:
+  * Compactor: Significant reduction of memory footprint for compaction and downsampling process.
+  * Querier: Accepting spaces between time range and square bracket. e.g `[ 5m]`
+  * Querier: Improved PromQL parser performance.
+
 ## [v0.9.0](https://github.com/thanos-io/thanos/releases/tag/v0.9.0) - 2019.12.03
 
 ### Added
