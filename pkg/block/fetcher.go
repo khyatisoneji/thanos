@@ -22,6 +22,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/relabel"
+	"github.com/prometheus/prometheus/tsdb"
 	tsdberrors "github.com/prometheus/prometheus/tsdb/errors"
 	"github.com/prometheus/prometheus/tsdb/fileutil"
 	"github.com/thanos-io/thanos/pkg/block/metadata"
@@ -425,24 +426,29 @@ func NewDeduplicateFilter() *DeduplicateFilter {
 // Filter filters out duplicate blocks that can be formed
 // from two or more overlapping blocks that fully submatches the source blocks of the older blocks.
 func (f *DeduplicateFilter) Filter(metas map[ulid.ULID]*metadata.Meta, synced GaugeLabeled, _ bool) {
-	root := &Node{}
+	root := NewNode(&metadata.Meta{
+		BlockMeta: tsdb.BlockMeta{
+			ULID: ulid.MustNew(uint64(0), nil),
+		},
+	})
 
+	metaSlice := []*metadata.Meta{}
 	for _, meta := range metas {
-		root.Children = append(root.Children, &Node{Meta: *meta})
+		metaSlice = append(metaSlice, meta)
 	}
-	sort.Slice(root.Children, func(i, j int) bool {
-		ilen := len(root.Children[i].Compaction.Sources)
-		jlen := len(root.Children[j].Compaction.Sources)
+	sort.Slice(metaSlice, func(i, j int) bool {
+		ilen := len(metaSlice[i].Compaction.Sources)
+		jlen := len(metaSlice[j].Compaction.Sources)
 
 		if ilen == jlen {
-			return root.Children[i].ULID.Compare(root.Children[j].ULID) < 0
+			return metaSlice[i].ULID.Compare(metaSlice[j].ULID) < 0
 		}
 
 		return ilen-jlen > 0
 	})
 
-	for _, newNode := range root.Children {
-		addNodeBySources(root, newNode)
+	for _, meta := range metaSlice {
+		addNodeBySources(root, NewNode(meta))
 	}
 
 	duplicateULIDs := getNonRootIDs(root)
@@ -472,6 +478,12 @@ func addNodeBySources(root *Node, add *Node) bool {
 			rootNode = node
 			break
 		}
+	}
+
+	// Block cannot be attached to any child nodes, add it as child of root.
+	if rootNode == nil {
+		root.Children = append(root.Children, add)
+		return true
 	}
 
 	return addNodeBySources(rootNode, add)

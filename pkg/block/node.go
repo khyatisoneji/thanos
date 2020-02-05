@@ -14,20 +14,28 @@ type Node struct {
 	Children []*Node
 }
 
+// NewNode creates a new node with children as empty slice.
+func NewNode(meta *metadata.Meta) *Node {
+	return &Node{
+		Meta:     *meta,
+		Children: []*Node{},
+	}
+}
+
 // getNonRootIDs returns list of ids which are not on root level.
 func getNonRootIDs(root *Node) []ulid.ULID {
 	var ulids []ulid.ULID
 	for _, node := range root.Children {
-		ulids = append(ulids, childrenToULIDs(root, node)...)
-		ulids = remove(ulids, root.ULID)
+		ulids = append(ulids, childrenToULIDs(node)...)
+		ulids = remove(ulids, node.ULID)
 	}
 	return ulids
 }
 
-func childrenToULIDs(a, b *Node) []ulid.ULID {
-	var ulids = []ulid.ULID{b.ULID}
+func childrenToULIDs(a *Node) []ulid.ULID {
+	var ulids = []ulid.ULID{a.ULID}
 	for _, childNode := range a.Children {
-		ulids = append(ulids, childrenToULIDs(a, childNode)...)
+		ulids = append(ulids, childrenToULIDs(childNode)...)
 	}
 	return ulids
 }
