@@ -28,6 +28,7 @@ import (
 	"github.com/prometheus/common/route"
 	"github.com/prometheus/prometheus/storage"
 	"github.com/prometheus/prometheus/tsdb"
+	errutil "github.com/prometheus/prometheus/tsdb/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

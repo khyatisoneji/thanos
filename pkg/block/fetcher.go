@@ -24,6 +24,7 @@ import (
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/relabel"
 	"github.com/prometheus/prometheus/tsdb"
+	errutil "github.com/prometheus/prometheus/tsdb/errors"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 

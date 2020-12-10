@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prometheus/prometheus/tsdb"
+	errutil "github.com/prometheus/prometheus/tsdb/errors"
 
 	"github.com/thanos-io/thanos/pkg/block/metadata"
 	"github.com/thanos-io/thanos/pkg/testutil"

@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/storage"
+	errutil "github.com/prometheus/prometheus/tsdb/errors"
 	"google.golang.org/grpc"
 
 	"github.com/thanos-io/thanos/pkg/store/labelpb"

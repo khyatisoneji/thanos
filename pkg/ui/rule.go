@@ -16,6 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/route"
 	"github.com/prometheus/prometheus/rules"
+	errutil "github.com/prometheus/prometheus/tsdb/errors"
 	"github.com/thanos-io/thanos/pkg/component"
 	extpromhttp "github.com/thanos-io/thanos/pkg/extprom/http"
 	thanosrules "github.com/thanos-io/thanos/pkg/rules"
