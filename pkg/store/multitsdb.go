@@ -21,7 +21,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/thanos-io/thanos/pkg/component"
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/runutil"
 	"github.com/thanos-io/thanos/pkg/store/labelpb"
 	"github.com/thanos-io/thanos/pkg/store/storepb"
@@ -168,7 +167,7 @@ func (s *tenantSeriesSetServer) Delegate(closer io.Closer) {
 }
 
 func (s *tenantSeriesSetServer) Close() error {
-	var merr errutil.MultiError
+	var merr errutil.multiError
 	for _, c := range s.closers {
 		merr.Add(c.Close())
 	}

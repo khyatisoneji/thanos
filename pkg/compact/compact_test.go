@@ -10,7 +10,6 @@ import (
 	"github.com/prometheus/prometheus/tsdb"
 
 	"github.com/thanos-io/thanos/pkg/block/metadata"
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/testutil"
 )
 
@@ -32,7 +31,7 @@ func TestHaltMultiError(t *testing.T) {
 	haltErr := halt(errors.New("halt error"))
 	nonHaltErr := errors.New("not a halt error")
 
-	errs := errutil.MultiError{nonHaltErr}
+	errs := errutil.multiError{nonHaltErr}
 	testutil.Assert(t, !IsHaltError(errs), "should not be a halt error")
 
 	errs.Add(haltErr)
@@ -45,15 +44,15 @@ func TestRetryMultiError(t *testing.T) {
 	retryErr := retry(errors.New("retry error"))
 	nonRetryErr := errors.New("not a retry error")
 
-	errs := errutil.MultiError{nonRetryErr}
+	errs := errutil.multiError{nonRetryErr}
 	testutil.Assert(t, !IsRetryError(errs), "should not be a retry error")
 
-	errs = errutil.MultiError{retryErr}
+	errs = errutil.multiError{retryErr}
 	testutil.Assert(t, IsRetryError(errs), "if all errors are retriable this should return true")
 
 	testutil.Assert(t, IsRetryError(errors.Wrap(errs, "wrap")), "retry error with wrap")
 
-	errs = errutil.MultiError{nonRetryErr, retryErr}
+	errs = errutil.multiError{nonRetryErr, retryErr}
 	testutil.Assert(t, !IsRetryError(errs), "mixed errors should return false")
 }
 

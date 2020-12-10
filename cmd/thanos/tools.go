@@ -11,7 +11,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/extkingpin"
 	"github.com/thanos-io/thanos/pkg/rules"
 )
@@ -35,7 +34,7 @@ func registerCheckRules(app extkingpin.AppClause) {
 }
 
 func checkRulesFiles(logger log.Logger, files *[]string) error {
-	var failed errutil.MultiError
+	var failed errutil.multiError
 
 	for _, fn := range *files {
 		level.Info(logger).Log("msg", "checking", "filename", fn)

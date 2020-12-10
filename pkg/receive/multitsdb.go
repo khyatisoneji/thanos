@@ -20,7 +20,6 @@ import (
 	"github.com/prometheus/prometheus/tsdb"
 	"github.com/thanos-io/thanos/pkg/block/metadata"
 	"github.com/thanos-io/thanos/pkg/component"
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/objstore"
 	"github.com/thanos-io/thanos/pkg/shipper"
 	"github.com/thanos-io/thanos/pkg/store"
@@ -141,7 +140,7 @@ func (t *MultiTSDB) Flush() error {
 	defer t.mtx.RUnlock()
 
 	errmtx := &sync.Mutex{}
-	merr := errutil.MultiError{}
+	merr := errutil.multiError{}
 	wg := &sync.WaitGroup{}
 	for id, tenant := range t.tenants {
 		db := tenant.readyStorage().Get()
@@ -170,7 +169,7 @@ func (t *MultiTSDB) Close() error {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	merr := errutil.MultiError{}
+	merr := errutil.multiError{}
 	for id, tenant := range t.tenants {
 		db := tenant.readyStorage().Get()
 		if db == nil {
@@ -193,7 +192,7 @@ func (t *MultiTSDB) Sync(ctx context.Context) (int, error) {
 
 	var (
 		errmtx   = &sync.Mutex{}
-		merr     = errutil.MultiError{}
+		merr     = errutil.multiError{}
 		wg       = &sync.WaitGroup{}
 		uploaded atomic.Int64
 	)
@@ -229,7 +228,7 @@ func (t *MultiTSDB) RemoveLockFilesIfAny() error {
 		return err
 	}
 
-	merr := errutil.MultiError{}
+	merr := errutil.multiError{}
 	for _, fi := range fis {
 		if !fi.IsDir() {
 			continue

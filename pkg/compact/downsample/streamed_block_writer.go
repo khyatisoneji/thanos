@@ -19,7 +19,6 @@ import (
 	"github.com/prometheus/prometheus/tsdb/index"
 	"github.com/thanos-io/thanos/pkg/block"
 	"github.com/thanos-io/thanos/pkg/block/metadata"
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/runutil"
 )
 
@@ -61,7 +60,7 @@ func NewStreamedBlockWriter(
 	// We should close any opened Closer up to an error.
 	defer func() {
 		if err != nil {
-			var merr errutil.MultiError
+			var merr errutil.multiError
 			merr.Add(err)
 			for _, cl := range closers {
 				merr.Add(cl.Close())
@@ -143,7 +142,7 @@ func (w *streamedBlockWriter) Close() error {
 	}
 	w.finalized = true
 
-	merr := errutil.MultiError{}
+	merr := errutil.multiError{}
 
 	if w.ignoreFinalize {
 		// Close open file descriptors anyway.

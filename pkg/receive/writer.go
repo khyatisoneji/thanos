@@ -14,7 +14,6 @@ import (
 	"github.com/prometheus/prometheus/storage"
 	"github.com/prometheus/prometheus/tsdb"
 
-	"github.com/thanos-io/thanos/pkg/errutil"
 	"github.com/thanos-io/thanos/pkg/store/storepb/prompb"
 )
 
@@ -59,7 +58,7 @@ func (r *Writer) Write(ctx context.Context, tenantID string, wreq *prompb.WriteR
 		return errors.Wrap(err, "get appender")
 	}
 
-	var errs errutil.MultiError
+	var errs errutil.multiError
 	for _, t := range wreq.Timeseries {
 		lset := make(labels.Labels, len(t.Labels))
 		for j := range t.Labels {

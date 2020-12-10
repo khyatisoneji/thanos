@@ -32,7 +32,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/thanos-io/thanos/pkg/errutil"
 	extpromhttp "github.com/thanos-io/thanos/pkg/extprom/http"
 	"github.com/thanos-io/thanos/pkg/runutil"
 	"github.com/thanos-io/thanos/pkg/server/http/middleware"
@@ -389,7 +388,7 @@ func (h *Handler) writeQuorum() int {
 // fanoutForward fans out concurrently given set of write requests. It returns status immediately when quorum of
 // requests succeeds or fails or if context is canceled.
 func (h *Handler) fanoutForward(pctx context.Context, tenant string, replicas map[string]replica, wreqs map[string]*prompb.WriteRequest, successThreshold int) error {
-	var errs errutil.MultiError
+	var errs errutil.multiError
 
 	fctx, cancel := context.WithTimeout(tracing.CopyTraceContext(context.Background(), pctx), h.options.ForwardTimeout)
 	defer func() {
@@ -453,7 +452,7 @@ func (h *Handler) fanoutForward(pctx context.Context, tenant string, replicas ma
 				if err != nil {
 					// When a MultiError is added to another MultiError, the error slices are concatenated, not nested.
 					// To avoid breaking the counting logic, we need to flatten the error.
-					if errs, ok := err.(errutil.MultiError); ok {
+					if errs, ok := err.(errutil.multiError); ok {
 						if countCause(errs, isConflict) > 0 {
 							err = errors.Wrap(conflictErr, errs.Error())
 						} else if countCause(errs, isNotReady) > 0 {
@@ -656,7 +655,7 @@ func (h *Handler) RemoteWrite(ctx context.Context, r *storepb.WriteRequest) (*st
 // countCause will inspect the error's cause or, if the error is a MultiError,
 // the cause of each contained error but will not traverse any deeper.
 func countCause(err error, f func(error) bool) int {
-	errs, ok := err.(errutil.MultiError)
+	errs, ok := err.(errutil.multiError)
 	if !ok {
 		errs = []error{err}
 	}
